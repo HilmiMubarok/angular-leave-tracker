@@ -1,0 +1,61 @@
+.leave-form-card {
+  margin: 16px;
+  border-radius: 8px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.date-fields {
+  display: flex;
+  gap: 16px;
+}
+
+.date-field {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.validation-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #fde8e8;
+  color: #d32f2f;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.validation-error mat-icon {
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .date-fields {
+    flex-direction: column;
+    gap: 0;
+  }
+}

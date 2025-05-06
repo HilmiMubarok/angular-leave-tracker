@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,23 +11,20 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EmployeeService } from '../../../core/services/employee/employee.service';
+import { LeaveService } from '../../../core/services/leave/leave.service';
 import { Employee } from '../../../core/models';
+import { Leave, LeaveStatistics, LeaveStatus } from '../../../core/models/leave.model';
 
-interface LeaveRecord {
-  id: number;
-  reason: string;
-  startDate: string;
-  endDate: string;
-  status: 'approved' | 'pending' | 'rejected';
-  durationDays: number;
-}
+
 
 @Component({
   selector: 'app-employee-detail',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -37,7 +34,8 @@ interface LeaveRecord {
     MatTabsModule,
     MatListModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './employee-detail.component.html',
   styleUrls: ['./employee-detail.component.css']
@@ -47,10 +45,13 @@ export class EmployeeDetailComponent implements OnInit {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private employeeService = inject(EmployeeService);
+  private leaveService = inject(LeaveService);
   
   employee = signal<Employee | null>(null);
-  leaveRecords = signal<LeaveRecord[]>([]);
+  leaveRecords = signal<Leave[]>([]);
+  leaveStatistics = signal<LeaveStatistics | null>(null);
   isLoading = signal<boolean>(true);
+  isLoadingLeaves = signal<boolean>(false);
   employeeId = signal<number | null>(null);
   
   ngOnInit(): void {
@@ -83,18 +84,21 @@ export class EmployeeDetailComponent implements OnInit {
   }
   
   loadEmployeeLeaveRecords(employeeId: number): void {
-    setTimeout(() => {
-      const mockLeaveRecords: LeaveRecord[] = Array.from({ length: 5 }, (_, i) => ({
-        id: i + 1,
-        reason: ['Vacation', 'Sick Leave', 'Personal Leave', 'Family Emergency', 'Medical Appointment'][i],
-        startDate: new Date(2025, i, i + 10).toISOString().split('T')[0],
-        endDate: new Date(2025, i, i + 11).toISOString().split('T')[0],
-        status: ['approved', 'pending', 'rejected', 'approved', 'pending'][i] as 'approved' | 'pending' | 'rejected',
-        durationDays: i % 3 === 0 ? 2 : 1
-      }));
-      
-      this.leaveRecords.set(mockLeaveRecords);
-    }, 1000);
+    this.isLoadingLeaves.set(true);
+    this.leaveService.getLeavesByEmployeeId(employeeId).subscribe({
+      next: (leaves) => {
+        this.leaveRecords.set(leaves);
+        this.isLoadingLeaves.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading leave records', error);
+        this.snackBar.open('Error loading leave records', 'Close', { duration: 3000 });
+        this.isLoadingLeaves.set(false);
+      }
+    });
+    
+    // Load leave statistics
+    this.loadLeaveStatistics(employeeId);
   }
   
   editEmployee(): void {
@@ -136,16 +140,66 @@ export class EmployeeDetailComponent implements OnInit {
     return emp ? `${emp.firstName} ${emp.lastName}` : '';
   }
   
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'approved': return 'status-approved';
-      case 'pending': return 'status-pending';
-      case 'rejected': return 'status-rejected';
+  getStatusClass(status: string | undefined): string {
+    if (!status) return '';
+    
+    switch (status.toLowerCase()) {
+      case LeaveStatus.APPROVED.toLowerCase(): return 'status-approved';
+      case LeaveStatus.PENDING.toLowerCase(): return 'status-pending';
+      case LeaveStatus.REJECTED.toLowerCase(): return 'status-rejected';
       default: return '';
     }
   }
   
   addLeave(): void {
-    this.snackBar.open('Leave management will be implemented in the next phase', 'OK', { duration: 3000 });
+    if (this.employeeId()) {
+      this.router.navigate(['/leaves/new'], { 
+        queryParams: { employeeId: this.employeeId() } 
+      });
+    }
+  }
+  
+  loadLeaveStatistics(employeeId: number): void {
+    this.leaveService.getLeaveStatistics(employeeId).subscribe({
+      next: (statistics) => {
+        this.leaveStatistics.set(statistics);
+      },
+      error: (error) => {
+        console.error('Error loading leave statistics', error);
+        this.snackBar.open('Error loading leave statistics', 'Close', { duration: 3000 });
+      }
+    });
+  }
+  
+  viewLeaveDetails(leaveId: number): void {
+    this.router.navigate(['/leaves', leaveId]);
+  }
+  
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString();
+  }
+  
+  getMonths(): string[] {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+      months.push(new Date(2025, i, 1).toLocaleString('default', { month: 'long' }));
+    }
+    return months;
+  }
+  
+  hasLeaveInMonth(month: string): boolean {
+    const stats = this.leaveStatistics();
+    if (!stats || !stats.leavesPerMonth) return false;
+    
+    return stats.leavesPerMonth[month] > 0;
+  }
+  
+  getMonthDays(month: string): string {
+    const stats = this.leaveStatistics();
+    if (!stats || !stats.leavesPerMonth) return '0 days';
+    
+    const days = stats.leavesPerMonth[month] || 0;
+    return `${days} day${days !== 1 ? 's' : ''}`;
   }
 }

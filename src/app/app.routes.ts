@@ -34,6 +34,12 @@ export const routes: Routes = [
           import('./features/employees/employees.routes').then((m) => m.EMPLOYEE_ROUTES),
       },
       {
+        path: 'leaves',
+        loadChildren: () =>
+          import('./features/leaves/leaves.routes').then((m) => m.LEAVE_ROUTES),
+        title: 'Leave Management - Leave Track',
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

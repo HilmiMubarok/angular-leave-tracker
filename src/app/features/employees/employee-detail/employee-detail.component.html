@@ -82,7 +82,12 @@
                 </button>
               </div>
               
-              @if (leaveRecords().length === 0) {
+              @if (isLoadingLeaves()) {
+                <div class="loading-container">
+                  <mat-spinner diameter="30"></mat-spinner>
+                  <p>Loading leave records...</p>
+                </div>
+              } @else if (leaveRecords().length === 0) {
                 <div class="empty-leaves">
                   <mat-icon>event_busy</mat-icon>
                   <p>No leave records found</p>
@@ -94,18 +99,18 @@
               } @else {
                 <mat-list>
                   @for (leave of leaveRecords(); track leave.id) {
-                    <mat-list-item>
+                    <mat-list-item (click)="viewLeaveDetails(leave.id!)">
                       <div class="leave-item">
                         <div class="leave-info">
                           <div class="leave-reason">{{ leave.reason }}</div>
                           <div class="leave-dates">
-                            {{ leave.startDate }} to {{ leave.endDate }}
-                            <span class="leave-duration">({{ leave.durationDays }} day{{ leave.durationDays > 1 ? 's' : '' }})</span>
+                            {{ formatDate(leave.startDate) }} to {{ formatDate(leave.endDate) }}
+                            <span class="leave-duration">({{ leave.durationDays }} day{{ leave.durationDays !== 1 ? 's' : '' }})</span>
                           </div>
                         </div>
                         <div class="leave-status">
                           <span class="status-badge" [ngClass]="getStatusClass(leave.status)">
-                            {{ leave.status | titlecase }}
+                            {{ leave.status }}
                           </span>
                         </div>
                       </div>
@@ -120,10 +125,48 @@
           <mat-tab label="Leave Statistics">
             <div class="tab-content">
               <h3>Leave Usage Statistics</h3>
-              <p class="stats-info">
-                <mat-icon>info</mat-icon>
-                Leave statistics will be implemented in the next phase
-              </p>
+              
+              @if (isLoadingLeaves()) {
+                <div class="loading-container">
+                  <mat-spinner diameter="30"></mat-spinner>
+                  <p>Loading statistics...</p>
+                </div>
+              } @else if (!leaveStatistics()) {
+                <p class="stats-info">
+                  <mat-icon>info</mat-icon>
+                  No leave statistics available
+                </p>
+              } @else {
+                <div class="statistics-container">
+                  <div class="stat-card">
+                    <div class="stat-header">
+                      <mat-icon>event_available</mat-icon>
+                      <h4>Leave Days Used</h4>
+                    </div>
+                    <div class="stat-value">{{ leaveStatistics()?.totalLeavesThisYear || 0 }}</div>
+                    <div class="stat-footer">out of 12 days this year</div>
+                  </div>
+                  
+                  <div class="stat-card">
+                    <div class="stat-header">
+                      <mat-icon>event_note</mat-icon>
+                      <h4>Remaining Leave Days</h4>
+                    </div>
+                    <div class="stat-value">{{ leaveStatistics()?.remainingLeavesThisYear || 0 }}</div>
+                    <div class="stat-footer">for the current year</div>
+                  </div>
+                </div>
+                
+                <h4 class="monthly-heading">Monthly Leave Usage</h4>
+                <div class="monthly-stats">
+                  @for (month of getMonths(); track month) {
+                    <div class="month-item" [class.has-leave]="hasLeaveInMonth(month)">
+                      <div class="month-name">{{ month }}</div>
+                      <div class="month-days">{{ getMonthDays(month) }}</div>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </mat-tab>
         </mat-tab-group>

@@ -1,0 +1,82 @@
+<mat-card class="leave-form-card">
+  <mat-card-header>
+    <mat-card-title>{{ getFormTitle() }}</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    @if (isLoading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading leave data...</p>
+      </div>
+    } @else {
+      <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
+        <div class="form-container">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Employee</mat-label>
+            <mat-select formControlName="employeeId">
+              <mat-option *ngFor="let employee of employees()" [value]="employee.id">
+                {{ employee.firstName }} {{ employee.lastName }}
+              </mat-option>
+            </mat-select>
+            <mat-error>{{ getErrorMessage('employeeId') }}</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Reason</mat-label>
+            <input matInput formControlName="reason" placeholder="Enter reason for leave">
+            <mat-error>{{ getErrorMessage('reason') }}</mat-error>
+          </mat-form-field>
+          
+          <div class="date-fields">
+            <mat-form-field appearance="outline" class="form-field date-field">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-error>{{ getErrorMessage('startDate') }}</mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="form-field date-field">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+              <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+              <mat-error>{{ getErrorMessage('endDate') }}</mat-error>
+            </mat-form-field>
+          </div>
+          
+          @if (getIsEditMode()) {
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="Pending">Pending</mat-option>
+                <mat-option value="Approved">Approved</mat-option>
+                <mat-option value="Rejected">Rejected</mat-option>
+              </mat-select>
+            </mat-form-field>
+          }
+          
+          @if (validationError()) {
+            <div class="validation-error">
+              <mat-icon>error</mat-icon>
+              <span>{{ validationError() }}</span>
+            </div>
+          }
+          
+          <div class="form-actions">
+            <button mat-button type="button" (click)="cancel()">Cancel</button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="leaveForm.invalid || isSaving()">
+              <mat-icon>save</mat-icon>
+              {{ getIsEditMode() ? 'Update' : 'Create' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    }
+  </mat-card-content>
+</mat-card>
