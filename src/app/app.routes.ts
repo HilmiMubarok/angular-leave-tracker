@@ -13,18 +13,32 @@ export const routes: Routes = [
     title: 'Login - Leave Track',
   },
   {
-    path: 'dashboard',
+    path: '',
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
     canActivate: [authGuard],
-    title: 'Dashboard - Leave Track',
-  },
-  {
-    path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent
+          ),
+        title: 'Dashboard - Leave Track',
+      },
+      {
+        path: 'employees',
+        loadChildren: () =>
+          import('./features/employees/employees.routes').then((m) => m.EMPLOYEE_ROUTES),
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+    ]
   },
   {
     path: '**',
