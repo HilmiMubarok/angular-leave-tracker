@@ -5,7 +5,7 @@ export interface Employee {
   email: string;
   phone: string;
   address: string;
-  gender: 'Male' | 'Female' | 'Other';
+  gender: 'Male' | 'Female';
 }
 
 export interface EmployeeWithLeaves extends Employee {
