@@ -17,7 +17,7 @@ export const MOCK_ADMINS: Admin[] = [
     email: 'jane.smith@example.com',
     birthDate: new Date('1985-05-20'),
     gender: 'Female',
-    password: 'Koploplo123!@#',
+    password: 'password123',
   },
   {
     id: 3,
