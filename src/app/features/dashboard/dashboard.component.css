@@ -1,11 +1,37 @@
 .dashboard-container {
-  padding: 24px;
-  max-width: 800px;
-  margin: 0 auto;
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+  height: calc(100vh - 40px);
+}
+
+.menu-container {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.menu-container mat-card {
+  height: 100%;
+  padding: 0;
+}
+
+.content-container {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .welcome-card {
+  width: 100%;
   margin-top: 20px;
+}
+
+.active-link {
+  background-color: rgba(103, 58, 183, 0.1);
+  border-left: 4px solid #673ab7;
+}
+
+.logout-link {
+  color: #f44336;
 }
 
 mat-card-title {

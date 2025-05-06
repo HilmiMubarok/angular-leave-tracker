@@ -1,0 +1,93 @@
+<div class="employee-list-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Employees</mat-card-title>
+      <mat-card-subtitle>Manage your employees</mat-card-subtitle>
+      <div class="spacer"></div>
+      <button mat-raised-button color="primary" (click)="addEmployee()">
+        <mat-icon>add</mat-icon>
+        Add Employee
+      </button>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="search-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search employees</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Search by name, email, or phone">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+      
+      @if (isLoading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading employees...</p>
+        </div>
+      } @else if (filteredEmployees().length === 0) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">people_outline</mat-icon>
+          <h3>No employees found</h3>
+          <p>Try adjusting your search or add a new employee</p>
+          <button mat-stroked-button color="primary" (click)="addEmployee()">
+            <mat-icon>add</mat-icon>
+            Add Employee
+          </button>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table mat-table [dataSource]="filteredEmployees()" matSort (matSortChange)="onSortChange($event)" class="employee-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+              <td mat-cell *matCellDef="let employee"> {{employee.id}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+              <td mat-cell *matCellDef="let employee"> {{getFullName(employee)}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+              <td mat-cell *matCellDef="let employee"> {{employee.email}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="phone">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+              <td mat-cell *matCellDef="let employee"> {{employee.phone}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="gender">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th>
+              <td mat-cell *matCellDef="let employee"> 
+                <span class="gender-badge">
+                  {{employee.gender | titlecase}}
+                </span>
+              </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let employee">
+                <button mat-icon-button color="primary" matTooltip="View details" (click)="viewEmployee(employee.id)">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" matTooltip="Edit" (click)="editEmployee(employee.id)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteEmployee(employee.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          
+
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

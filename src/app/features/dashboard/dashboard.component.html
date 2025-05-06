@@ -1,26 +1,48 @@
 <div class="dashboard-container">
-  <mat-card class="welcome-card">
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>account_circle</mat-icon>
-      </div>
-      <mat-card-title>Welcome to Leave Track</mat-card-title>
-      <mat-card-subtitle>
-        @if (admin(); as adminData) {
-          Hello, {{adminData.firstName}} {{adminData.lastName}}
-        }
-      </mat-card-subtitle>
-    </mat-card-header>
+  <div class="menu-container">
+    <mat-card>
+      <mat-nav-list>
+        <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>dashboard</mat-icon>
+          <span matListItemTitle>Dashboard</span>
+        </a>
+        <a mat-list-item routerLink="/employees" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>people</mat-icon>
+          <span matListItemTitle>Employees</span>
+        </a>
+        <mat-divider></mat-divider>
+        <a mat-list-item (click)="logout()" class="logout-link">
+          <mat-icon matListItemIcon>logout</mat-icon>
+          <span matListItemTitle>Logout</span>
+        </a>
+      </mat-nav-list>
+    </mat-card>
+  </div>
 
-    <mat-card-content>
-      <p>You have successfully logged in to the system.</p>
-    </mat-card-content>
+  <div class="content-container">
+    
+    @if (isDashboardRoute()) {
+      <mat-card class="welcome-card">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <mat-card-title>Welcome to Leave Track</mat-card-title>
+          <mat-card-subtitle>
+            @if (admin(); as adminData) {
+              Hello, {{adminData.firstName}} {{adminData.lastName}}
+            }
+          </mat-card-subtitle>
+        </mat-card-header>
 
-    <mat-card-actions>
-      <button mat-raised-button color="warn" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        Logout
-      </button>
-    </mat-card-actions>
-  </mat-card>
+        <mat-card-content>
+          <p>You have successfully logged in to the system.</p>
+          <p>Use the menu on the left to navigate through the application.</p>
+        </mat-card-content>
+      </mat-card>
+    }
+    @else {
+      <router-outlet></router-outlet>
+    }
+  </div>
 </div>

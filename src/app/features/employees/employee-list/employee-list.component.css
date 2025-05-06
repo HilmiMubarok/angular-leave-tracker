@@ -1,0 +1,104 @@
+.employee-list-container {
+  padding: 16px;
+}
+
+mat-card {
+  margin-bottom: 20px;
+}
+
+mat-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.search-container {
+  margin-bottom: 16px;
+}
+
+.search-field {
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+  color: rgba(0, 0, 0, 0.3);
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.empty-state p {
+  margin-bottom: 24px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.employee-table {
+  width: 100%;
+}
+
+.gender-badge {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .employee-table .mat-column-id,
+  .employee-table .mat-column-gender {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .employee-table .mat-column-phone {
+    display: none;
+  }
+  
+  mat-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  mat-card-header button {
+    margin-top: 16px;
+    align-self: flex-end;
+  }
+}

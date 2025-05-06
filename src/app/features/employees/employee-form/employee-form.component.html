@@ -1,0 +1,105 @@
+<div class="employee-form-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode() ? 'Edit Employee' : 'Add New Employee' }}</mat-card-title>
+      <mat-card-subtitle>{{ isEditMode() ? 'Update employee information' : 'Create a new employee record' }}</mat-card-subtitle>
+    </mat-card-header>
+    
+    @if (isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    
+    <mat-card-content>
+      <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" placeholder="Enter first name">
+            <mat-error *ngFor="let validation of validationMessages.firstName">
+              <span *ngIf="employeeForm.get('firstName')?.hasError(validation.type) && 
+                          (employeeForm.get('firstName')?.dirty || employeeForm.get('firstName')?.touched)">
+                {{ validation.message }}
+              </span>
+            </mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" placeholder="Enter last name">
+            <mat-error *ngFor="let validation of validationMessages.lastName">
+              <span *ngIf="employeeForm.get('lastName')?.hasError(validation.type) && 
+                          (employeeForm.get('lastName')?.dirty || employeeForm.get('lastName')?.touched)">
+                {{ validation.message }}
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="Enter email address" type="email">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngFor="let validation of validationMessages.email">
+            <span *ngIf="employeeForm.get('email')?.hasError(validation.type) && 
+                        (employeeForm.get('email')?.dirty || employeeForm.get('email')?.touched)">
+              {{ validation.message }}
+            </span>
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phone" placeholder="Enter phone number">
+          <mat-icon matSuffix>phone</mat-icon>
+          <mat-error *ngFor="let validation of validationMessages.phone">
+            <span *ngIf="employeeForm.get('phone')?.hasError(validation.type) && 
+                        (employeeForm.get('phone')?.dirty || employeeForm.get('phone')?.touched)">
+              {{ validation.message }}
+            </span>
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address</mat-label>
+          <textarea matInput formControlName="address" placeholder="Enter address" rows="3"></textarea>
+          <mat-icon matSuffix>home</mat-icon>
+          <mat-error *ngFor="let validation of validationMessages.address">
+            <span *ngIf="employeeForm.get('address')?.hasError(validation.type) && 
+                        (employeeForm.get('address')?.dirty || employeeForm.get('address')?.touched)">
+              {{ validation.message }}
+            </span>
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Gender</mat-label>
+          <mat-select formControlName="gender">
+            <mat-option value="male">Male</mat-option>
+            <mat-option value="female">Female</mat-option>
+          </mat-select>
+          <mat-error *ngFor="let validation of validationMessages.gender">
+            <span *ngIf="employeeForm.get('gender')?.hasError(validation.type) && 
+                        (employeeForm.get('gender')?.dirty || employeeForm.get('gender')?.touched)">
+              {{ validation.message }}
+            </span>
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+    
+    <mat-card-actions align="end">
+      <button mat-button (click)="cancel()" [disabled]="isSaving()">CANCEL</button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onSubmit()" 
+        [disabled]="employeeForm.invalid || isSaving()">
+        <span *ngIf="!isSaving()">{{ isEditMode() ? 'UPDATE' : 'SAVE' }}</span>
+        <span *ngIf="isSaving()">
+          <mat-icon class="spinner">sync</mat-icon>
+          {{ isEditMode() ? 'UPDATING...' : 'SAVING...' }}
+        </span>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
